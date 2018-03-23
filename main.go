@@ -157,7 +157,6 @@ func ontMain(ctx *cli.Context) {
 	}
 	ldgerActor := ldgactor.NewLedgerActor()
 	ledgerPID := ldgerActor.Start()
-
 	log.Info("3. Start the transaction pool server")
 	// Start the transaction pool server
 	txPoolServer := txnpool.StartTxnPoolServer()
@@ -196,8 +195,10 @@ func ontMain(ctx *cli.Context) {
 	go restful.StartServer()
 
 	noder.SyncNodeHeight()
-	noder.WaitForPeersStart()
-	noder.WaitForSyncBlkFinish()
+	if consensusType != "vbft" {
+		noder.WaitForPeersStart()
+		noder.WaitForSyncBlkFinish()
+    }
 	if protocol.SERVICE_NODE_NAME != config.Parameters.NodeType {
 		log.Info("5. Start Consensus Services")
 		pool := txPoolServer.GetPID(tc.TxPoolActor)
@@ -208,6 +209,8 @@ func ontMain(ctx *cli.Context) {
 		hserver.SetConsensusPid(consensusService.GetPID())
 		go localrpc.StartLocalServer()
 	}
+	noder.WaitForPeersStart()
+	noder.WaitForSyncBlkFinish()
 
 	log.Info("--Start the RPC interface")
 	go jsonrpc.StartRPCServer()
