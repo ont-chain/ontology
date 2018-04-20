@@ -214,7 +214,7 @@ func InitNode(pubKey keypair.PublicKey) protocol.Noder {
 func (n *node) NodeDisconnect(v interface{}) {
 	if node, ok := v.(*node); ok {
 		node.SetState(protocol.INACTIVITY)
-		NotifyPeerState(node.GetPubKey(), false)
+		msg.NotifyPeerState(node.GetPubKey(), false)
 		conn := node.getConn()
 		conn.Close()
 	}
