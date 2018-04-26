@@ -33,11 +33,10 @@ import (
 
 var (
 	InfoCommand = cli.Command{
-		Action:   utils.MigrateFlags(infoCommand),
-		Name:     "info",
-		Usage:    "ontology info [block|chain|transaction|version] [OPTION]",
-		Flags:    append(NodeFlags, InfoFlags...),
-		Category: "INFO COMMANDS",
+		Action: utils.MigrateFlags(infoCommand),
+		Name:   "info",
+		Usage:  "Display informations about the chain",
+		Flags:  append(NodeFlags, InfoFlags...),
 		Subcommands: []cli.Command{
 			blockCommandSet,
 			txCommandSet,
@@ -46,6 +45,40 @@ var (
 		Description: ``,
 	}
 )
+
+var blockCommandSet = cli.Command{
+	Action:       utils.MigrateFlags(blockInfoCommand),
+	Name:         "block",
+	Usage:        "Display block informations",
+	Flags:        append(NodeFlags, InfoFlags...),
+	OnUsageError: blockInfoUsageError,
+	Description:  ``,
+	Subcommands: []cli.Command{
+		{
+			Action:      utils.MigrateFlags(getCurrentBlockHeight),
+			Name:        "count",
+			Usage:       "issue asset by command",
+			Description: ``,
+		},
+	},
+}
+
+var txCommandSet = cli.Command{
+	Action:       utils.MigrateFlags(txInfoCommand),
+	Name:         "tx",
+	Usage:        "Display transaction informations",
+	Flags:        append(NodeFlags, InfoFlags...),
+	OnUsageError: txInfoUsageError,
+	Description:  ``,
+}
+
+var versionCommand = cli.Command{
+	Action:       utils.MigrateFlags(versionInfoCommand),
+	Name:         "version",
+	Usage:        "Display the version",
+	OnUsageError: versionInfoUsageError,
+	Description:  ``,
+}
 
 func infoCommand(context *cli.Context) error {
 	showInfoHelp()
@@ -68,54 +101,16 @@ func getCurrentBlockHeight(ctx *cli.Context) error {
 	return nil
 }
 
-var blockCommandSet = cli.Command{
-	Action:       utils.MigrateFlags(blockInfoCommand),
-	Name:         "block",
-	Usage:        "./ontology info block [OPTION]",
-	Flags:        append(NodeFlags, InfoFlags...),
-	OnUsageError: blockInfoUsageError,
-	Category:     "INFO COMMANDS",
-	Description:  ``,
-	Subcommands: []cli.Command{
-		{
-			Action:      utils.MigrateFlags(getCurrentBlockHeight),
-			Name:        "count",
-			Usage:       "issue asset by command",
-			Category:    "INFO COMMANDS",
-			Description: ``,
-		},
-	},
-}
-
 func txInfoUsageError(context *cli.Context, err error, isSubcommand bool) error {
 	fmt.Println("Error:", err.Error())
 	showTxInfoHelp()
 	return nil
 }
 
-var txCommandSet = cli.Command{
-	Action:       utils.MigrateFlags(txInfoCommand),
-	Name:         "tx",
-	Usage:        "ontology info tx [OPTION]\n",
-	Flags:        append(NodeFlags, InfoFlags...),
-	OnUsageError: txInfoUsageError,
-	Category:     "INFO COMMANDS",
-	Description:  ``,
-}
-
 func versionInfoUsageError(context *cli.Context, err error, isSubcommand bool) error {
 	fmt.Println("Error:", err.Error())
 	showVersionInfoHelp()
 	return nil
-}
-
-var versionCommand = cli.Command{
-	Action:       utils.MigrateFlags(versionInfoCommand),
-	Name:         "version",
-	Usage:        "ontology info version\n",
-	OnUsageError: versionInfoUsageError,
-	Category:     "INFO COMMANDS",
-	Description:  ``,
 }
 
 func versionInfoCommand(ctx *cli.Context) error {
